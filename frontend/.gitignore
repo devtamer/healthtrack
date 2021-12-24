@@ -1,0 +1,7 @@
+.next/
+node_modules/
+
+drugs.json
+*.log
+.env
+.DS_Store
