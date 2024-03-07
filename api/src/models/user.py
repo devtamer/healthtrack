@@ -13,7 +13,7 @@ import jwt, datetime
 from webargs.flaskparser import abort
 
 from api import db
-from api import bcrypt
+import bcrypt
 
 from api.src.utils.stripped_string import StrippedString
 import api.src.models.access as access
@@ -42,7 +42,9 @@ class UserModel(db.Model, am.BaseModel, metaclass=am.MetaBaseModel):
 
     def __init__(self, email, password, roles=[]):
         self.email = email
-        self.password = bcrypt.generate_password_hash(password).decode('utf-8')
+        password_bytes = password.encode('utf-8')
+        hashed_pass = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
+        self.password = hashed_pass.decode('utf-8')
         for role in roles:
             self.add_role(role)
 

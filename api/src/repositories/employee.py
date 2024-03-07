@@ -3,7 +3,6 @@ from flask import jsonify, request
 from functools import wraps
 import webargs
 from webargs.flaskparser import abort
-from api import bcrypt
 from webargs import ValidationError
 
 import api.src.models.employee as emp

@@ -1,6 +1,4 @@
-from re import I
 from flask import Flask
-from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_cors import CORS
@@ -9,7 +7,6 @@ from .config import DevelopmentConfig
 
 db = SQLAlchemy()
 ma = Marshmallow()
-bcrypt = Bcrypt()
 cors = CORS()
 
 def create_app(config_class=DevelopmentConfig):
@@ -17,14 +14,11 @@ def create_app(config_class=DevelopmentConfig):
     app.config.from_object(config_class) 
     
     db.init_app(app) 
-    bcrypt.init_app(app)
     ma.init_app(app)
     cors.init_app(app, resources={r"/*": {"origins": "*"}})
     app.config['CORS_HEADERS'] = 'Content-Type'
 
-    
     """ Add Resources and Rules for API Endpoints """
-    
     
     import api.src.views.patient  as patient
     import api.src.views.physician as md

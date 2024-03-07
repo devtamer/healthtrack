@@ -3,7 +3,7 @@ from flask import jsonify, request
 from functools import wraps
 import webargs
 from webargs.flaskparser import abort
-from api import bcrypt
+import bcrypt
 from webargs import ValidationError
 
 import api.src.models.user as user
@@ -13,8 +13,9 @@ class UserRepo():
     @staticmethod
     def validate_password(user: user.UserModel, password):
         """ Validate User Password """
+        passwd_bytes = password.encode('utf-8')
 
-        if not bcrypt.check_password_hash(user.password, password):
+        if not bcrypt.checkpw(passwd_bytes, user.password):
              raise ValidationError("Incorrect Password!")  
 
     @staticmethod
