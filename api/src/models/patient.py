@@ -12,11 +12,12 @@ import api.src.models.appointment as appt
 from api.src.utils.stripped_string import StrippedString
 from api import db
 
-
+# Define the PatientModel class
 class PatientModel(db.Model, am.BaseModel, metaclass=am.MetaBaseModel):
     __tablename__ = 'patientmodel'
     __table_args__ = {'extend_existing': True}
 
+    # Define the columns of the table
     id = db.Column(db.Integer, db.Identity(start=1), primary_key=True)
     owner = db.Column(db.Integer, default = 1, nullable=False)
     group = db.Column(db.Integer, default = 8, nullable=False) # default group is medical staff
@@ -32,15 +33,16 @@ class PatientModel(db.Model, am.BaseModel, metaclass=am.MetaBaseModel):
     gender = db.Column(db.String(20), unique=False, nullable=True)
     medications = db.Column(db.String(200), unique=False, nullable=True) # need to implement a one to many relationship for a Patient model to Medication models
 
-    # foreign keys
+    # Define the foreign keys
     pcp_id = db.Column(db.Integer, db.ForeignKey("physicianmodel.id"))
 
-    # relationships
+    # Define the relationships
     appointments = db.relationship("AppointmentModel", cascade="all,delete",backref="patientmodel", lazy=True)
 
     def __init__(self, first_name, last_name, number, email="",
                     address="", insurance="", dob="", gender="", pcp_id="", 
                     medications="", appointments=[]):
+        # Initialize the attributes of the PatientModel instance
         self.first_name = first_name
         self.last_name = last_name
         self.number = number

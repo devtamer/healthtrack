@@ -12,14 +12,17 @@ from sqlalchemy.types import TypeDecorator
 
 from api import db, ma
 import api.src.models.abstractmodel as am
+import api.src.models.user as user
+import api.src.models.laborder as lab
+
 from api.src.utils.stripped_string import StrippedString
+
 class EmployeeType(enum.Enum):
     PA = "Phsyician's Assistant"
     RN = "Nurse"
     MA = "Medical Assistant"
     PD = "Pharamacist"
     LT = "Lab Technician"
-
 
 class EmployeeModel(db.Model, am.BaseModel, metaclass=am.MetaBaseModel):
     __tablename__ = 'employeemodel'

@@ -14,55 +14,60 @@ import psycopg2, psycopg2.extensions, psycopg2.extras
 import pandas as pd
 import json
 
-connection = psycopg2.connect("dbname=postgres user=postgres_user password=postgres_password host=127.0.0.1 port=5000") 
-
+print('Connecting to the PostgreSQL database...')
+connection = psycopg2.connect("dbname=health user=postgres password=yourpassword host=127.0.0.1 port=5432") 
+print("Connection successful!")
 
 def create_staging_table(cursor):
     cursor.execute("""
-        DROP 
-            TABLE 
-        IF EXISTS 
-        product;
-        CREATE TYPE mkt_status AS ENUM ('Discontinued', 'Over-the-counter', 'Prescription', 'None (Tentative Approval)' );
+        DROP TABLE IF EXISTS product;
+        DROP TABLE IF EXISTS ingredient;
+        DROP TABLE IF EXISTS ingredient_product;
+        DROP TYPE IF EXISTS mkt_status; 
+        
+        CREATE TYPE mkt_status AS ENUM ('Discontinued', 'Over-the-counter', 'Prescription', 'None (Tentative Approval)');
+        
         CREATE TABLE product (
             id BIGSERIAL NOT NULL PRIMARY KEY,
-            reference_drug F,
-            brand_name VARCHAR(64),
-            reference_standard VARCHAR(64),
-            dosage_form VARCHAR(64),
-            route VARCHAR(64),
-            marketing_status mkt_status,
+            reference_drug VARCHAR(128) NOT NULL,
+            brand_name VARCHAR(128),
+            reference_standard VARCHAR(128),
+            dosage_form VARCHAR(128),
+            route VARCHAR(128),
+            marketing_status mkt_status
         );
+        
         CREATE TABLE ingredient (
             id BIGSERIAL PRIMARY KEY,
             name VARCHAR(128),
-            strength VARCHAR(64)
+            strength VARCHAR(128)
         );
+        
         CREATE TABLE ingredient_product (
             ingredient_id BIGINT,
             product_id BIGINT,
             PRIMARY KEY (product_id, ingredient_id)
         );
-        """)
+    """)
 
 with connection.cursor() as cur:
-    # create_staging_table(cursor)
+    create_staging_table(cur)
     f = open('drugs.json')
  
     # returns JSON object as
     # a dictionary
     data = json.load(f)
-    print(data.keys())
 
     for sub in data['results']:
         if 'products' in sub.keys():
             for p in sub['products']:
-                "INSERT INTO ({}, {}) products {}"
                 cur.execute("""
                     INSERT INTO product (reference_drug, brand_name, reference_standard, dosage_form, route, marketing_status)
                     VALUES (%s, %s, %s, %s, %s, %s);
                     """,
-                    (p['reference_drug'], p['brand_name'], p['reference_standard'] if 'reference_standard' in p.keys() else 'No', p['dosage_form'], p['route'], p['marketing_status'] if p['marketing_status'] != ' ' else 'None (Tentative Approval)'))
+                    (p['reference_drug'] if  'reference_drug' in p.keys() else 'No', p['brand_name'], p['reference_standard'] if 
+                     'reference_standard' in p.keys() else 
+                     'No', p['dosage_form'], p['route'], p['marketing_status'] if p['marketing_status'] != ' ' else 'None (Tentative Approval)'))
 
     
     # psycopg2.extras.execute_batch(cur, insert_stmt, df.values)
